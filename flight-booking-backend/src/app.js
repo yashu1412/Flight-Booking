@@ -36,7 +36,7 @@ const allowedOrigins = new Set([
   "http://localhost:5174",
   "http://127.0.0.1:5174",
   "http://localhost:3000",
-  "http://127.0.0.1:3000"
+  "https://flight-booking-5naa.vercel.app/"
 ].filter(Boolean));
 
 app.use(cors({
