@@ -16,7 +16,6 @@ const routes = require("./routes");
 // Import middleware
 const errorHandler = require("./middleware/errorHandler");
 const { notFoundHandler } = require("./middleware/errorHandler");
-const { generalLimiter } = require("./middleware/rateLimiter");
 
 // Initialize Express app
 const app = express();
@@ -27,29 +26,18 @@ const app = express();
 app.use(helmet());
 
 // ==========================================
-// CORS CONFIGURATION
+// CORS CONFIGURATION (ALLOW ALL ORIGINS)
 // ==========================================
-const allowedOrigins = new Set([
-  environment.FRONTEND_URL,
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:5174",
-  "http://127.0.0.1:5174",
-  "http://localhost:3000",
-  "https://flight-booking-5naa.vercel.app/"
-].filter(Boolean));
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.has(origin)) return callback(null, true);
-    return callback(new Error(`CORS: Origin ${origin} not allowed`));
-  },
+  origin: true,            // ✅ allow all origins
+  credentials: true,       // ✅ allow cookies/auth headers
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-  maxAge: 86400 // 24 hours
+  maxAge: 86400            // cache preflight for 24h
 }));
+
+// Handle preflight requests
+app.options("*", cors());
 
 // ==========================================
 // BODY PARSING MIDDLEWARE
@@ -65,8 +53,6 @@ if (environment.NODE_ENV === "development") {
 } else {
   app.use(morgan("combined"));
 }
-
-// Rate limiting applied at route level
 
 // ==========================================
 // HEALTH CHECK ENDPOINT
@@ -108,22 +94,12 @@ app.get("/", (req, res) => {
     success: true,
     message: "Flight Booking System API",
     version: "1.0.0",
-    documentation: "/api",
     endpoints: {
       auth: "/api/auth",
       flights: "/api/flights",
       bookings: "/api/bookings",
       wallet: "/api/wallet"
-    },
-    features: [
-      "User Authentication (JWT)",
-      "Flight Search & Filtering",
-      "Dynamic Surge Pricing",
-      "Wallet System (₹50,000 default)",
-      "Booking with PNR Generation",
-      "PDF Ticket Download",
-      "Booking History"
-    ]
+    }
   });
 });
 
@@ -149,6 +125,7 @@ const PORT = environment.PORT || 5000;
 
 const startServer = async () => {
   let dbConnected = false;
+
   try {
     const dbTest = await pool.query("SELECT NOW()");
     dbConnected = true;
@@ -164,56 +141,44 @@ const startServer = async () => {
 ║   🚀 FLIGHT BOOKING SYSTEM API                            ║
 ║                                                            ║
 ║   Server running on: http://localhost:${PORT}               ║
-║   Environment: ${environment.NODE_ENV.padEnd(39)}║
-║                                                            ║
-║   Endpoints:                                               ║
-║   • Health:    GET  /health                                ║
-║   • Auth:      POST /api/auth/register                     ║
-║   •            POST /api/auth/login                        ║
-║   • Flights:   GET  /api/flights                           ║
-║   •            GET  /api/flights/search                    ║
-║   • Bookings:  POST /api/bookings/confirm                  ║
-║   •            GET  /api/bookings/history                  ║
-║   • Wallet:    GET  /api/wallet/balance                    ║
+║   Environment: ${environment.NODE_ENV}                     ║
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
     `);
+
     if (!dbConnected) {
-      console.warn("⚠️ Server started without DB connection. /health/db will return 503.");
+      console.warn("⚠️ Server started without DB connection.");
     }
   });
 };
 
-// Handle uncaught exceptions
+// ==========================================
+// PROCESS ERROR HANDLING
+// ==========================================
 process.on("uncaughtException", (error) => {
   console.error("❌ Uncaught Exception:", error);
   process.exit(1);
 });
 
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+process.on("unhandledRejection", (reason) => {
+  console.error("❌ Unhandled Rejection:", reason);
   process.exit(1);
 });
 
-// Graceful shutdown
+// ==========================================
+// GRACEFUL SHUTDOWN
+// ==========================================
 process.on("SIGTERM", () => {
-  console.log("👋 SIGTERM received. Shutting down gracefully...");
-  pool.end(() => {
-    console.log("Database pool closed.");
-    process.exit(0);
-  });
+  console.log("👋 SIGTERM received. Shutting down...");
+  pool.end(() => process.exit(0));
 });
 
 process.on("SIGINT", () => {
-  console.log("👋 SIGINT received. Shutting down gracefully...");
-  pool.end(() => {
-    console.log("Database pool closed.");
-    process.exit(0);
-  });
+  console.log("👋 SIGINT received. Shutting down...");
+  pool.end(() => process.exit(0));
 });
 
-// Start the server
+// Start server
 startServer();
 
 module.exports = app;
