@@ -124,13 +124,6 @@ Email:    demo@example.com
 Password: password123
 Wallet:   ₹50,000
 ```
-
-### Admin User
-```
-Email:    admin@example.com
-Password: admin123
-```
-
 ---
 
 ## 🌟 Key Features
