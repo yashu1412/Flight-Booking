@@ -244,25 +244,6 @@ npm run build
 ```
 
 ---
-
-## ✅ Assignment Compliance Checklist
-
-- ✅ Database-driven flight search (15 flights in PostgreSQL)
-- ✅ Dynamic surge pricing (3 attempts → 10% in 5 min, reset after 10 min)
-- ✅ Wallet system (₹50,000 default, deduction on booking)
-- ✅ PDF ticket generation (with PNR, passenger name, flight details, price, date/time)
-- ✅ Booking history (flight details, amount paid, booking date, PNR, download button)
-- ✅ Sorting & filtering flights
-- ✅ Surge pricing indicators
-- ✅ Responsive UI with TailwindCSS
-- ✅ Authentication (login/register)
-- ✅ Search by cities
-- ✅ Dark/Light mode
-- ✅ Clean code structure
-- ✅ Comprehensive README
-- ✅ Error handling & validation
-- ✅ Rate limiting & security
-
 ---
 
-**Built with ❤️ by XTechon - Full Stack Excellence**
+**Built with ❤️ by Yashpalsingh Pawara - Full Stack Excellence**
