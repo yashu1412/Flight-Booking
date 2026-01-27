@@ -4,7 +4,7 @@ import { useTheme } from "../context/ThemeContext.jsx"
 import api from "../lib/api.js"
 
 export default function Navbar() {
-  const { isDark } = useTheme()
+  const { isDark, toggleTheme } = useTheme()
   const [balance, setBalance] = useState(null)
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
@@ -118,9 +118,9 @@ export default function Navbar() {
             })}
           </nav>
           <div className="flex items-center gap-3">
-            {/* <button onClick={toggleTheme} className="px-4 py-2 rounded-full border dark:border-hairline light:border-light-border dark:bg-surface light:bg-light-surface dark:hover:bg-panelHover light:hover:bg-[#E8E9EB] transition-colors flex items-center gap-2 text-sm font-medium" title={isDark ? "Light mode" : "Dark mode"}>
+            <button onClick={toggleTheme} className="px-4 py-2 rounded-full border dark:border-hairline light:border-light-border dark:bg-surface light:bg-light-surface dark:hover:bg-panelHover light:hover:bg-[#E8E9EB] transition-colors flex items-center gap-2 text-sm font-medium" title={isDark ? "Light mode" : "Dark mode"}>
               {isDark ? "☀️ Light" : "🌙 Dark"}
-            </button> */}
+            </button>
             {!token && (
               <>
                 <button onClick={() => setShowLogin(true)} className="px-4 py-2 rounded-full border border-hairline bg-transparent text-sm">Login</button>
